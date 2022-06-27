@@ -75,7 +75,8 @@ VdpDecoderProfile get_VdpDecoderProfile(VAProfile profile)
     case VAProfileMPEG4Simple:  return VDP_DECODER_PROFILE_MPEG4_PART2_SP;
     case VAProfileMPEG4AdvancedSimple: return VDP_DECODER_PROFILE_MPEG4_PART2_ASP;
 #endif
-    case VAProfileH264Baseline: return VDP_DECODER_PROFILE_H264_BASELINE;
+    case VAProfileH264ConstrainedBaseline:
+        return VDP_DECODER_PROFILE_H264_BASELINE;
     case VAProfileH264Main:     return VDP_DECODER_PROFILE_H264_MAIN;
     case VAProfileH264High:     return VDP_DECODER_PROFILE_H264_HIGH;
     case VAProfileVC1Simple:    return VDP_DECODER_PROFILE_VC1_SIMPLE;
@@ -143,6 +144,7 @@ get_max_ref_frames(
     int max_ref_frames = 2;
 
     switch (profile) {
+    case VDP_DECODER_PROFILE_H264_BASELINE:
     case VDP_DECODER_PROFILE_H264_MAIN:
     case VDP_DECODER_PROFILE_H264_HIGH:
     {
@@ -1058,7 +1060,7 @@ vdpau_QueryConfigProfiles(
         VAProfileMPEG4Simple,
         VAProfileMPEG4AdvancedSimple,
         VAProfileMPEG4Main,
-        VAProfileH264Baseline,
+        VAProfileH264ConstrainedBaseline,
         VAProfileH264Main,
         VAProfileH264High,
         VAProfileVC1Simple,
@@ -1108,7 +1110,7 @@ vdpau_QueryConfigEntrypoints(
     case VAProfileMPEG4Main:
         entrypoint = VAEntrypointVLD;
         break;
-    case VAProfileH264Baseline:
+    case VAProfileH264ConstrainedBaseline:
     case VAProfileH264Main:
     case VAProfileH264High:
         entrypoint = VAEntrypointVLD;
