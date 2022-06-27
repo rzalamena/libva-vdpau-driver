@@ -743,22 +743,6 @@ gl_init_vtable(void)
         gl_vtable->has_fragment_program = 1;
     }
 
-    /* GL_ARB_multitexture */
-    has_extension = (
-        find_string("GL_ARB_multitexture", gl_extensions, " ")
-    );
-    if (has_extension) {
-        gl_vtable->gl_active_texture = (PFNGLACTIVETEXTUREPROC)
-            get_proc_address("glActiveTextureARB");
-        if (!gl_vtable->gl_active_texture)
-            return NULL;
-        gl_vtable->gl_multi_tex_coord_2f = (PFNGLMULTITEXCOORD2FPROC)
-            get_proc_address("glMultiTexCoord2fARB");
-        if (!gl_vtable->gl_multi_tex_coord_2f)
-            return NULL;
-        gl_vtable->has_multitexture = 1;
-    }
-
     /* GL_NV_vdpau_interop */
     has_extension = (
         find_string("GL_NV_vdpau_interop", gl_extensions, " ")

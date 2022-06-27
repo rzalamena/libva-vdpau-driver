@@ -159,8 +159,6 @@ struct _GLVTable {
     PFNGLPROGRAMSTRINGARBPROC             gl_program_string;
     PFNGLGETPROGRAMIVARBPROC              gl_get_program_iv;
     PFNGLPROGRAMLOCALPARAMETER4FVARBPROC  gl_program_local_parameter_4fv;
-    PFNGLACTIVETEXTUREPROC                gl_active_texture;
-    PFNGLMULTITEXCOORD2FPROC              gl_multi_tex_coord_2f;
     PFNGLVDPAUINITNVPROC                  gl_vdpau_init;
     PFNGLVDPAUFININVPROC                  gl_vdpau_fini;
     PFNGLVDPAUREGISTERVIDEOSURFACENVPROC  gl_vdpau_register_video_surface;
@@ -176,7 +174,6 @@ struct _GLVTable {
     unsigned int                          has_texture_from_pixmap       : 1;
     unsigned int                          has_framebuffer_object        : 1;
     unsigned int                          has_fragment_program          : 1;
-    unsigned int                          has_multitexture              : 1;
     unsigned int                          has_vdpau_interop             : 1;
 };
 
