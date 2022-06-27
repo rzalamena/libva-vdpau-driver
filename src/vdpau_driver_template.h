@@ -101,6 +101,17 @@ struct VA_DRIVER_VTABLE {
 		VASurfaceID *surfaces		/* out */
 	);
 
+	VAStatus (*vaCreateSurfaces2) (
+		VADriverContextP ctx,
+		unsigned int format,
+		unsigned int width,
+		unsigned int height,
+		VASurfaceID *surfaces,		/* out */
+		unsigned int num_surfaces,
+		VASurfaceAttrib *attrib_list,
+		unsigned int num_attribs
+	);
+
 	VAStatus (*vaDestroySurfaces) (
 		VADriverContextP ctx,
 		VASurfaceID *surface_list,
@@ -465,6 +476,7 @@ static VAStatus FUNC(Initialize)(VA_DRIVER_CONTEXT_P ctx)
     vtable->vaDestroyConfig                 = vdpau_DestroyConfig;
     vtable->vaGetConfigAttributes           = vdpau_GetConfigAttributes;
     vtable->vaCreateSurfaces                = vdpau_CreateSurfaces;
+    vtable->vaCreateSurfaces2               = vdpau_CreateSurfaces2;
     vtable->vaDestroySurfaces               = vdpau_DestroySurfaces;
     vtable->vaCreateContext                 = vdpau_CreateContext;
     vtable->vaDestroyContext                = vdpau_DestroyContext;
