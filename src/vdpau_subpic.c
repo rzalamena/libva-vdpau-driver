@@ -593,18 +593,6 @@ vdpau_SetSubpictureImage(
     return VA_STATUS_SUCCESS;
 }
 
-// vaSetSubpicturePalette (not a PUBLIC interface)
-VAStatus
-vdpau_SetSubpicturePalette(
-    VADriverContextP    ctx,
-    VASubpictureID      subpicture,
-    unsigned char      *palette
-)
-{
-    /* TODO */
-    return VA_STATUS_ERROR_OPERATION_FAILED;
-}
-
 // vaSetSubpictureChromaKey
 VAStatus
 vdpau_SetSubpictureChromakey(
@@ -643,45 +631,6 @@ vdpau_SetSubpictureGlobalAlpha(
 
     obj_subpicture->alpha = global_alpha;
     return VA_STATUS_SUCCESS;
-}
-
-// vaAssociateSubpicture
-VAStatus
-vdpau_AssociateSubpicture(
-    VADriverContextP    ctx,
-    VASubpictureID      subpicture,
-    VASurfaceID        *target_surfaces,
-    int                 num_surfaces,
-    short               src_x,
-    short               src_y,
-    short               dest_x,
-    short               dest_y,
-    unsigned short      width,
-    unsigned short      height,
-    unsigned int        flags
-)
-{
-    VDPAU_DRIVER_DATA_INIT;
-
-    if (!target_surfaces || num_surfaces == 0)
-        return VA_STATUS_SUCCESS;
-
-    object_subpicture_p obj_subpicture = VDPAU_SUBPICTURE(subpicture);
-    if (!obj_subpicture)
-        return VA_STATUS_ERROR_INVALID_SUBPICTURE;
-
-    VARectangle src_rect, dst_rect;
-    src_rect.x      = src_x;
-    src_rect.y      = src_y;
-    src_rect.width  = width;
-    src_rect.height = height;
-    dst_rect.x      = dest_x;
-    dst_rect.y      = dest_y;
-    dst_rect.width  = width;
-    dst_rect.height = height;
-    return associate_subpicture(driver_data, obj_subpicture,
-                                target_surfaces, num_surfaces,
-                                &src_rect, &dst_rect, flags);
 }
 
 // vaAssociateSubpicture2

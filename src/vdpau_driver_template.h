@@ -25,34 +25,11 @@
 #undef  FUNC
 #define FUNC(name)      CONCAT(CONCAT(CONCAT(vdpau_,name),_),VA_INIT_SUFFIX)
 
-#undef  VA_INIT_CHECK_VERSION
-#define VA_INIT_CHECK_VERSION(major, minor, micro)      \
-    (VA_INIT_VERSION_MAJOR > (major) ||                 \
-     (VA_INIT_VERSION_MAJOR == (major) &&               \
-      VA_INIT_VERSION_MINOR > (minor)) ||               \
-     (VA_INIT_VERSION_MAJOR == (major) &&               \
-      VA_INIT_VERSION_MINOR == (minor) &&               \
-      VA_INIT_VERSION_MICRO >= (micro)))
-
-#undef  VA_INIT_CHECK_VERSION_SDS
-#define VA_INIT_CHECK_VERSION_SDS(major, minor, micro, sds)             \
-    (VA_INIT_CHECK_VERSION(major, minor, (micro)+1) ||                  \
-     (VA_INIT_CHECK_VERSION(major, minor, micro) &&                     \
-      VA_INIT_VERSION_SDS >= (sds)))
-
 #ifndef VA_INIT_SUFFIX
 #define VA_INIT_SUFFIX  Current
 #define VA_INIT_CURRENT 1
 #else
 #define VA_INIT_CURRENT 0
-#endif
-
-#ifndef VA_INIT_VERSION_SDS
-#define VA_INIT_VERSION_SDS 0
-#endif
-
-#ifndef VA_INIT_GLX
-#define VA_INIT_GLX     0
 #endif
 
 #if VA_INIT_CURRENT
@@ -207,14 +184,12 @@ struct VA_DRIVER_VTABLE {
 		VASurfaceStatus *status	/* out */
 	);
 
-#if VA_INIT_CHECK_VERSION(0,31,2)
         VAStatus (*vaQuerySurfaceError) (
                 VADriverContextP ctx,
                 VASurfaceID render_target,
                 VAStatus error_status,
                 void **error_info /*out*/
         );
-#endif
 
 	VAStatus (*vaPutSurface) (
     		VADriverContextP ctx,
@@ -376,7 +351,6 @@ struct VA_DRIVER_VTABLE {
                 int num_attributes
         );
 
-#if VA_INIT_CHECK_VERSION(0,31,1)
         /* used by va trace */        
         VAStatus (*vaBufferInfo) (
                 VADriverContextP ctx,
@@ -410,56 +384,15 @@ struct VA_DRIVER_VTABLE {
 		VADriverContextP ctx,
                 VASurfaceID surface
         );
-
-#if !VA_INIT_CHECK_VERSION(0,32,0)
-        /* Optional: GLX support hooks */
-        struct VADriverVTableGLX *glx;
-#endif
-#else
-        /* device specific */
-	VAStatus (*vaCreateSurfaceFromCIFrame) (
-		VADriverContextP ctx,
-		unsigned long frame_id,
-		VASurfaceID *surface		/* out */
-	);
-    
-    
-        VAStatus (*vaCreateSurfaceFromV4L2Buf) (
-		VADriverContextP ctx,
-                int v4l2_fd,         /* file descriptor of V4L2 device */
-                struct v4l2_format *v4l2_fmt,       /* format of V4L2 */
-                struct v4l2_buffer *v4l2_buf,       /* V4L2 buffer */
-                VASurfaceID *surface	           /* out */
-        );
-    
-        VAStatus (*vaCopySurfaceToBuffer) (
-		VADriverContextP ctx,
-                VASurfaceID surface,
-                unsigned int *fourcc, /* out  for follow argument */
-                unsigned int *luma_stride,
-                unsigned int *chroma_u_stride,
-                unsigned int *chroma_v_stride,
-                unsigned int *luma_offset,
-                unsigned int *chroma_u_offset,
-                unsigned int *chroma_v_offset,
-                void **buffer
-        );
-#endif
 };
 
 /* Driver context */
 struct VA_DRIVER_CONTEXT {
     void *pDriverData;
-#if VA_INIT_CHECK_VERSION(0,32,0)
     struct VA_DRIVER_VTABLE *vtable;
     struct VADriverVTableGLX *vtable_glx;
     struct VADriverVTableEGL *vtable_egl;
-#else
-    struct VA_DRIVER_VTABLE vtable;
-#endif
-#if VA_INIT_CHECK_VERSION(0,31,1)
     void *vtable_tpi; /* the structure is malloc-ed */
-#endif
 
     Display *native_dpy;
     int x11_screen;
@@ -476,58 +409,8 @@ struct VA_DRIVER_CONTEXT {
     void *handle;			/* dlopen handle */
     
     void *dri_state;
-#if VA_INIT_CHECK_VERSION(0,31,1)
     void *glx;                         /* opaque for GLX code */
-#endif
 };
-#endif
-
-// Check for VA/GLX changes from libVA API >= 0.31.0-sds2
-#if VA_INIT_GLX
-#if VA_INIT_CHECK_VERSION_SDS(0,31,0,2)
-typedef struct VADriverVTableGLX *VA_DRIVER_VTABLE_GLX_P;
-#else
-typedef struct VA_DRIVER_VTABLE  *VA_DRIVER_VTABLE_GLX_P;
-#endif
-
-static inline VA_DRIVER_VTABLE_GLX_P FUNC(GetVTableGLX)(VA_DRIVER_CONTEXT_P ctx)
-{
-#if VA_INIT_CHECK_VERSION_SDS(0,31,0,6)
-#if VA_INIT_CHECK_VERSION(0,32,0)
-    /* Upstream VA-API 0.32 */
-    VA_DRIVER_VTABLE_GLX_P *p_vtable_glx = &ctx->vtable_glx;
-#else
-    /* Upstream VA-API 0.31.1 or SDS >= 0.31.0-sds6 */
-    VA_DRIVER_VTABLE_GLX_P *p_vtable_glx = &ctx->vtable.glx;
-#endif
-    VA_DRIVER_VTABLE_GLX_P vtable_glx = *p_vtable_glx;
-
-    if (!vtable_glx) {
-        vtable_glx = calloc(1, sizeof(*vtable_glx));
-        if (!vtable_glx)
-            return NULL;
-        *p_vtable_glx = vtable_glx;
-    }
-    return vtable_glx;
-#elif VA_INIT_CHECK_VERSION_SDS(0,31,0,2)
-    /* SDS >= 0.31.0-sds2 */
-    return &ctx->vtable.glx;
-#else
-    /* Any other VA-API version 0.31.0 or lower */
-    return &ctx->vtable;
-#endif
-}
-
-static inline void FUNC(ReleaseVTableGLX)(VA_DRIVER_CONTEXT_P ctx)
-{
-#if VA_INIT_CHECK_VERSION(0,32,0)
-    free(ctx->vtable_glx);
-    ctx->vtable_glx = NULL;
-#elif VA_INIT_CHECK_VERSION_SDS(0,31,0,6)
-    free(ctx->vtable.glx);
-    ctx->vtable.glx = NULL;
-#endif
-}
 #endif
 
 static VAStatus FUNC(Terminate)(VA_DRIVER_CONTEXT_P ctx)
@@ -535,10 +418,6 @@ static VAStatus FUNC(Terminate)(VA_DRIVER_CONTEXT_P ctx)
     VDPAU_DRIVER_DATA_INIT;
 
     vdpau_common_Terminate(driver_data);
-
-#if VA_INIT_GLX
-    FUNC(ReleaseVTableGLX)(ctx);
-#endif
 
     free(ctx->pDriverData);
     ctx->pDriverData = NULL;
@@ -575,11 +454,7 @@ static VAStatus FUNC(Initialize)(VA_DRIVER_CONTEXT_P ctx)
     ctx->str_vendor             = driver_data->va_vendor;
 
     struct VA_DRIVER_VTABLE *vtable;
-#if VA_INIT_CHECK_VERSION(0,32,0)
     vtable = ctx->vtable;
-#else
-    vtable = &ctx->vtable;
-#endif
     memset(vtable, 0, sizeof(*vtable));
     vtable->vaTerminate                     = FUNC(Terminate);
     vtable->vaQueryConfigEntrypoints        = vdpau_QueryConfigEntrypoints;
@@ -601,11 +476,7 @@ static VAStatus FUNC(Initialize)(VA_DRIVER_CONTEXT_P ctx)
     vtable->vaBeginPicture                  = vdpau_BeginPicture;
     vtable->vaRenderPicture                 = vdpau_RenderPicture;
     vtable->vaEndPicture                    = vdpau_EndPicture;
-#if VA_INIT_CHECK_VERSION(0,31,0)
     vtable->vaSyncSurface                   = vdpau_SyncSurface2;
-#else
-    vtable->vaSyncSurface                   = vdpau_SyncSurface3;
-#endif
     vtable->vaQuerySurfaceStatus            = vdpau_QuerySurfaceStatus;
     vtable->vaPutSurface                    = vdpau_PutSurface;
     vtable->vaQueryImageFormats             = vdpau_QueryImageFormats;
@@ -614,65 +485,29 @@ static VAStatus FUNC(Initialize)(VA_DRIVER_CONTEXT_P ctx)
     vtable->vaDestroyImage                  = vdpau_DestroyImage;
     vtable->vaSetImagePalette               = vdpau_SetImagePalette;
     vtable->vaGetImage                      = vdpau_GetImage;
-#if VA_INIT_CHECK_VERSION(0,31,0)
     vtable->vaPutImage                      = vdpau_PutImage_full;
-#else
-    vtable->vaPutImage                      = vdpau_PutImage;
-    vtable->vaPutImage2                     = vdpau_PutImage_full;
-#endif
     vtable->vaQuerySubpictureFormats        = vdpau_QuerySubpictureFormats;
     vtable->vaCreateSubpicture              = vdpau_CreateSubpicture;
     vtable->vaDestroySubpicture             = vdpau_DestroySubpicture;
     vtable->vaSetSubpictureImage            = vdpau_SetSubpictureImage;
     vtable->vaSetSubpictureChromakey        = vdpau_SetSubpictureChromakey;
     vtable->vaSetSubpictureGlobalAlpha      = vdpau_SetSubpictureGlobalAlpha;
-#if VA_INIT_CHECK_VERSION(0,31,0)
     vtable->vaAssociateSubpicture           = vdpau_AssociateSubpicture_full;
-#else
-    vtable->vaAssociateSubpicture           = vdpau_AssociateSubpicture;
-    vtable->vaAssociateSubpicture2          = vdpau_AssociateSubpicture_full;
-#endif
     vtable->vaDeassociateSubpicture         = vdpau_DeassociateSubpicture;
     vtable->vaQueryDisplayAttributes        = vdpau_QueryDisplayAttributes;
     vtable->vaGetDisplayAttributes          = vdpau_GetDisplayAttributes;
     vtable->vaSetDisplayAttributes          = vdpau_SetDisplayAttributes;
-#if VA_INIT_CHECK_VERSION(0,31,1)
-#if VA_INIT_CHECK_VERSION(0,32,0)
     vtable->vaBufferInfo                    = vdpau_BufferInfo;
-#else
-    vtable->vaBufferInfo                    = vdpau_BufferInfo_0_31_1;
-#endif
     vtable->vaLockSurface                   = vdpau_LockSurface;
     vtable->vaUnlockSurface                 = vdpau_UnlockSurface;
-#else
-#if VA_INIT_CHECK_VERSION(0,30,0)
-    vtable->vaCreateSurfaceFromCIFrame      = vdpau_CreateSurfaceFromCIFrame;
-    vtable->vaCreateSurfaceFromV4L2Buf      = vdpau_CreateSurfaceFromV4L2Buf;
-    vtable->vaCopySurfaceToBuffer           = vdpau_CopySurfaceToBuffer;
-#else
-    vtable->vaSetSubpicturePalette          = vdpau_SetSubpicturePalette;
-    vtable->vaDbgCopySurfaceToBuffer        = vdpau_DbgCopySurfaceToBuffer;
-#endif
-#endif
 
-#if VA_INIT_GLX
-    VA_DRIVER_VTABLE_GLX_P const glx_vtable = FUNC(GetVTableGLX)(ctx);
-    if (!glx_vtable)
-        return VA_STATUS_ERROR_ALLOCATION_FAILED;
-    glx_vtable->vaCreateSurfaceGLX          = vdpau_CreateSurfaceGLX;
-    glx_vtable->vaDestroySurfaceGLX         = vdpau_DestroySurfaceGLX;
-    glx_vtable->vaCopySurfaceGLX            = vdpau_CopySurfaceGLX;
-#endif
     return VA_STATUS_SUCCESS;
 }
 
 #undef VA_INIT_CURRENT
 #undef VA_INIT_VERSION_MAJOR
 #undef VA_INIT_VERSION_MINOR
-#undef VA_INIT_VERSION_MICRO
-#undef VA_INIT_VERSION_SDS
 #undef VA_INIT_SUFFIX
-#undef VA_INIT_GLX
 
 #undef VA_DRIVER_VTABLE
 #undef VA_DRIVER_VTABLE_GLX_P

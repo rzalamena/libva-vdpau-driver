@@ -102,14 +102,6 @@ vdpau_SetSubpictureImage(
     VAImageID           image
 ) attribute_hidden;
 
-// vaSetSubpicturePalette (not a PUBLIC interface)
-VAStatus
-vdpau_SetSubpicturePalette(
-    VADriverContextP    ctx,
-    VASubpictureID      subpicture,
-    unsigned char      *palette
-) attribute_hidden;
-
 // vaSetSubpictureChromaKey
 VAStatus
 vdpau_SetSubpictureChromakey(
@@ -126,22 +118,6 @@ vdpau_SetSubpictureGlobalAlpha(
     VADriverContextP    ctx,
     VASubpictureID      subpicture,
     float               global_alpha
-) attribute_hidden;
-
-// vaAssociateSubpicture
-VAStatus
-vdpau_AssociateSubpicture(
-    VADriverContextP    ctx,
-    VASubpictureID      subpicture,
-    VASurfaceID        *target_surfaces,
-    int                 num_surfaces,
-    short               src_x,
-    short               src_y,
-    short               dest_x,
-    short               dest_y,
-    unsigned short      width,
-    unsigned short      height,
-    unsigned int        flags
 ) attribute_hidden;
 
 // vaAssociateSubpicture2

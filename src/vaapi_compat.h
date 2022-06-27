@@ -58,10 +58,6 @@
 #define VA_SRC_SMPTE_240                0x00000040
 #endif
 
-#if VA_CHECK_VERSION(0,31,1)
 typedef void *VADrawable;
-#else
-typedef Drawable VADrawable;
-#endif
 
 #endif /* VAAPI_COMPAT_H */

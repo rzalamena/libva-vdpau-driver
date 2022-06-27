@@ -92,20 +92,6 @@ vdpau_GetImage(
     VAImageID           image_id
 ) attribute_hidden;
 
-// vaPutImage
-VAStatus
-vdpau_PutImage(
-    VADriverContextP    ctx,
-    VASurfaceID         surface,
-    VAImageID           image,
-    int                 src_x,
-    int                 src_y,
-    unsigned int        width,
-    unsigned int        height,
-    int                 dest_x,
-    int                 dest_y
-) attribute_hidden;
-
 // vaPutImage2
 VAStatus
 vdpau_PutImage_full(

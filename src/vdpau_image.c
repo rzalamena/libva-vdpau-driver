@@ -592,42 +592,6 @@ put_image(
     return vdpau_get_VAStatus(vdp_status);
 }
 
-// vaPutImage
-VAStatus
-vdpau_PutImage(
-    VADriverContextP    ctx,
-    VASurfaceID         surface,
-    VAImageID           image,
-    int                 src_x,
-    int                 src_y,
-    unsigned int        width,
-    unsigned int        height,
-    int                 dest_x,
-    int                 dest_y
-)
-{
-    VDPAU_DRIVER_DATA_INIT;
-
-    object_surface_p obj_surface = VDPAU_SURFACE(surface);
-    if (!obj_surface)
-        return VA_STATUS_ERROR_INVALID_SURFACE;
-
-    object_image_p obj_image = VDPAU_IMAGE(image);
-    if (!obj_image)
-        return VA_STATUS_ERROR_INVALID_IMAGE;
-
-    VARectangle src_rect, dst_rect;
-    src_rect.x      = src_x;
-    src_rect.y      = src_y;
-    src_rect.width  = width;
-    src_rect.height = height;
-    dst_rect.x      = dest_x;
-    dst_rect.y      = dest_y;
-    dst_rect.width  = width;
-    dst_rect.height = height;
-    return put_image(driver_data, obj_surface, obj_image, &src_rect, &dst_rect);
-}
-
 // vaPutImage2
 VAStatus
 vdpau_PutImage_full(

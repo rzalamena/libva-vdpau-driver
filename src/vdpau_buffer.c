@@ -255,19 +255,6 @@ vdpau_UnmapBuffer(
 
 // vaBufferInfo
 VAStatus
-vdpau_BufferInfo_0_31_1(
-    VADriverContextP    ctx,
-    VAContextID         context,
-    VABufferID          buf_id,
-    VABufferType       *type,
-    unsigned int       *size,
-    unsigned int       *num_elements
-)
-{
-    return vdpau_BufferInfo(ctx, buf_id, type, size, num_elements);
-}
-
-VAStatus
 vdpau_BufferInfo(
     VADriverContextP    ctx,
     VABufferID          buf_id,

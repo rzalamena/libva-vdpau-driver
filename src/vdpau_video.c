@@ -715,29 +715,6 @@ vdpau_SyncSurface2(
     return sync_surface(driver_data, obj_surface);
 }
 
-VAStatus
-vdpau_SyncSurface3(
-    VADriverContextP    ctx,
-    VAContextID         context,
-    VASurfaceID         render_target
-)
-{
-    VDPAU_DRIVER_DATA_INIT;
-
-    object_surface_p obj_surface = VDPAU_SURFACE(render_target);
-    if (!obj_surface)
-        return VA_STATUS_ERROR_INVALID_SURFACE;
-
-    /* Assume that this shouldn't be called before vaEndPicture() */
-    object_context_p obj_context = VDPAU_CONTEXT(context);
-    if (obj_context) {
-        ASSERT(obj_context->current_render_target != obj_surface->base.id);
-        if (obj_context->current_render_target == obj_surface->base.id)
-            return VA_STATUS_ERROR_INVALID_CONTEXT;
-    }
-    return sync_surface(driver_data, obj_surface);
-}
-
 // Ensure VA Display Attributes are initialized
 static int ensure_display_attributes(vdpau_driver_data_t *driver_data)
 {
@@ -896,67 +873,6 @@ vdpau_SetDisplayAttributes(
     return VA_STATUS_SUCCESS;
 }
 
-// vaDbgCopySurfaceToBuffer (not a PUBLIC interface)
-VAStatus
-vdpau_DbgCopySurfaceToBuffer(
-    VADriverContextP    ctx,
-    VASurfaceID         surface,
-    void              **buffer,
-    unsigned int       *stride
-)
-{
-    /* TODO */
-    return VA_STATUS_ERROR_UNKNOWN;
-}
-
-#if VA_CHECK_VERSION(0,30,0)
-// vaCreateSurfaceFromCIFrame
-VAStatus
-vdpau_CreateSurfaceFromCIFrame(
-    VADriverContextP    ctx,
-    unsigned long       frame_id,
-    VASurfaceID        *surface
-)
-{
-    /* TODO */
-    return VA_STATUS_ERROR_UNKNOWN;
-}
-
-// vaCreateSurfaceFromV4L2Buf
-VAStatus
-vdpau_CreateSurfaceFromV4L2Buf(
-    VADriverContextP    ctx,
-    int                 v4l2_fd,
-    struct v4l2_format *v4l2_fmt,
-    struct v4l2_buffer *v4l2_buf,
-    VASurfaceID        *surface
-)
-{
-    /* TODO */
-    return VA_STATUS_ERROR_UNKNOWN;
-}
-
-// vaCopySurfaceToBuffer
-VAStatus
-vdpau_CopySurfaceToBuffer(
-    VADriverContextP    ctx,
-    VASurfaceID         surface,
-    unsigned int       *fourcc,
-    unsigned int       *luma_stride,
-    unsigned int       *chroma_u_stride,
-    unsigned int       *chroma_v_stride,
-    unsigned int       *luma_offset,
-    unsigned int       *chroma_u_offset,
-    unsigned int       *chroma_v_offset,
-    void              **buffer
-)
-{
-    /* TODO */
-    return VA_STATUS_ERROR_UNKNOWN;
-}
-#endif
-
-#if VA_CHECK_VERSION(0,31,1)
 // vaLockSurface
 VAStatus
 vdpau_LockSurface(
@@ -994,4 +910,3 @@ vdpau_UnlockSurface(
 {
     return VA_STATUS_SUCCESS;
 }
-#endif

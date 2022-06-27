@@ -219,14 +219,6 @@ vdpau_SyncSurface2(
     VASurfaceID         render_target
 ) attribute_hidden;
 
-// vaSyncSurface 3-args variant (<= 0.30)
-VAStatus
-vdpau_SyncSurface3(
-    VADriverContextP    ctx,
-    VAContextID         context,
-    VASurfaceID         render_target
-) attribute_hidden;
-
 // vaQueryDisplayAttributes
 VAStatus
 vdpau_QueryDisplayAttributes(
@@ -251,51 +243,6 @@ vdpau_SetDisplayAttributes(
     int                 num_attributes
 ) attribute_hidden;
 
-// vaDbgCopySurfaceToBuffer (not a PUBLIC interface)
-VAStatus
-vdpau_DbgCopySurfaceToBuffer(
-    VADriverContextP    ctx,
-    VASurfaceID         surface,
-    void              **buffer,
-    unsigned int       *stride
-) attribute_hidden;
-
-#if VA_CHECK_VERSION(0,30,0)
-// vaCreateSurfaceFromCIFrame
-VAStatus
-vdpau_CreateSurfaceFromCIFrame(
-    VADriverContextP    ctx,
-    unsigned long       frame_id,
-    VASurfaceID        *surface
-) attribute_hidden;
-
-// vaCreateSurfaceFromV4L2Buf
-VAStatus
-vdpau_CreateSurfaceFromV4L2Buf(
-    VADriverContextP    ctx,
-    int                 v4l2_fd,
-    struct v4l2_format *v4l2_fmt,
-    struct v4l2_buffer *v4l2_buf,
-    VASurfaceID        *surface
-) attribute_hidden;
-
-// vaCopySurfaceToBuffer
-VAStatus
-vdpau_CopySurfaceToBuffer(
-    VADriverContextP    ctx,
-    VASurfaceID         surface,
-    unsigned int       *fourcc,
-    unsigned int       *luma_stride,
-    unsigned int       *chroma_u_stride,
-    unsigned int       *chroma_v_stride,
-    unsigned int       *luma_offset,
-    unsigned int       *chroma_u_offset,
-    unsigned int       *chroma_v_offset,
-    void              **buffer
-) attribute_hidden;
-#endif
-
-#if VA_CHECK_VERSION(0,31,1)
 // vaLockSurface
 VAStatus
 vdpau_LockSurface(
@@ -318,6 +265,5 @@ vdpau_UnlockSurface(
     VADriverContextP    ctx,
     VASurfaceID         surface
 ) attribute_hidden;
-#endif
 
 #endif /* VDPAU_VIDEO_H */

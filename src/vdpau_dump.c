@@ -53,19 +53,13 @@ const char *string_of_VABufferType(VABufferType type)
         _(VAResidualDataBufferType);
         _(VADeblockingParameterBufferType);
         _(VAImageBufferType);
-#if VA_CHECK_VERSION(0,30,0)
         _(VAProtectedSliceDataBufferType);
         _(VAEncCodedBufferType);
         _(VAEncSequenceParameterBufferType);
         _(VAEncPictureParameterBufferType);
         _(VAEncSliceParameterBufferType);
-#endif
-#if VA_CHECK_VERSION(0,31,1)
         _(VAQMatrixBufferType);
-#endif
-#if VA_CHECK_VERSION(0,32,0)
         _(VAEncMiscParameterBufferType);
-#endif
     default:
         break;
 #undef _
