@@ -189,6 +189,13 @@ struct VA_DRIVER_VTABLE {
 		VASurfaceID render_target
 	);
 
+	VAStatus (*vaQuerySurfaceAttributes) (
+		VADriverContextP ctx,
+		VAConfigID config,
+		VASurfaceAttrib *attrib_list, /* out */
+		unsigned int *num_attribs     /* out */
+	);
+
 	VAStatus (*vaQuerySurfaceStatus) (
 		VADriverContextP ctx,
 		VASurfaceID render_target,
@@ -489,6 +496,7 @@ static VAStatus FUNC(Initialize)(VA_DRIVER_CONTEXT_P ctx)
     vtable->vaRenderPicture                 = vdpau_RenderPicture;
     vtable->vaEndPicture                    = vdpau_EndPicture;
     vtable->vaSyncSurface                   = vdpau_SyncSurface2;
+    vtable->vaQuerySurfaceAttributes        = vdpau_QuerySurfaceAttributes;
     vtable->vaQuerySurfaceStatus            = vdpau_QuerySurfaceStatus;
     vtable->vaPutSurface                    = vdpau_PutSurface;
     vtable->vaQueryImageFormats             = vdpau_QueryImageFormats;

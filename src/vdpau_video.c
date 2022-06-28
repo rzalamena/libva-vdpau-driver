@@ -614,6 +614,57 @@ vdpau_CreateContext(
     return VA_STATUS_SUCCESS;
 }
 
+// vaQuerySurfaceAttributes
+VAStatus
+vdpau_QuerySurfaceAttributes(
+    VADriverContextP    ctx,
+    VAConfigID          config_id,
+    VASurfaceAttrib    *attrib_list,
+    unsigned int       *num_attribs
+)
+{
+    VDPAU_DRIVER_DATA_INIT;
+    object_config_p config;
+    VdpDecoderProfile vdp_profile;
+    uint32_t max_height, max_width;
+
+    config = VDPAU_CONFIG(config_id);
+    if (config == NULL)
+	    return VA_STATUS_ERROR_INVALID_CONFIG;
+
+    vdp_profile = get_VdpDecoderProfile(config->profile);
+    if (get_max_surface_size(driver_data, vdp_profile, &max_width, &max_height) == VDP_FALSE)
+	    return VA_STATUS_ERROR_UNSUPPORTED_PROFILE;
+
+    /*
+     * `libva`'s `vaQuerySurfaceAttributes` will accept `attrib_list` as
+     * NULL (which means we want to find out the attribute list size),
+     * however `num_attribs` should never be NULL or less than we expect.
+     */
+    if (num_attribs == NULL)
+	    return VA_STATUS_ERROR_INVALID_PARAMETER;
+    if (attrib_list == NULL) {
+	    *num_attribs = 2;
+	    return VA_STATUS_SUCCESS;
+    }
+    if (*num_attribs < 2) {
+	    *num_attribs = 2;
+	    return VA_STATUS_ERROR_MAX_NUM_EXCEEDED;
+    }
+
+    attrib_list[0].type = VASurfaceAttribMaxWidth;
+    attrib_list[0].flags = VA_SURFACE_ATTRIB_GETTABLE;
+    attrib_list[0].value.type = VAGenericValueTypeInteger;
+    attrib_list[0].value.value.i = (int32_t)max_width;
+
+    attrib_list[1].type = VASurfaceAttribMaxHeight;
+    attrib_list[1].flags = VA_SURFACE_ATTRIB_GETTABLE;
+    attrib_list[1].value.type = VAGenericValueTypeInteger;
+    attrib_list[1].value.value.i = (int32_t)max_height;
+
+    return VA_STATUS_SUCCESS;
+}
+
 // Query surface status
 VAStatus
 query_surface_status(

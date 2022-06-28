@@ -217,6 +217,14 @@ vdpau_DestroyContext(
     VAContextID         context
 ) attribute_hidden;
 
+VAStatus
+vdpau_QuerySurfaceAttributes(
+    VADriverContextP    ctx,
+    VAConfigID          config,
+    VASurfaceAttrib    *attrib_list,
+    unsigned int       *num_attribs
+) attribute_hidden;
+
 // vaQuerySurfaceStatus
 VAStatus
 vdpau_QuerySurfaceStatus(
