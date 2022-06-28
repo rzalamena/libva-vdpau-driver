@@ -47,6 +47,7 @@
 #if USE_DEBUG
 # define ASSERT assert
 #else
+#include "debug.h"
 # define ASSERT(expr) do {                                              \
         if (!(expr)) {                                                  \
             vdpau_error_message("Assertion failed in file %s at line %d\n", \
