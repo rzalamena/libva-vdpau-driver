@@ -53,9 +53,10 @@ void list_free(UList *list)
 
 UList *list_append(UList *list, void *data)
 {
-    UList * const node = list_new(data, list_last(list), NULL);
+    if (list == NULL)
+	    return list_new(data, NULL, NULL);
 
-    return list ? list : node;
+    return list_new(data, list_last(list), NULL);
 }
 
 UList *list_prepend(UList *list, void *data)
