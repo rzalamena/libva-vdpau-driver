@@ -468,8 +468,12 @@ gl_set_current_context(GLContextState *new_cs, GLContextState *old_cs)
     /* If display is NULL, this could be that new_cs was retrieved from
        gl_get_current_context() with none set previously. If that case,
        the other fields are also NULL and we don't return an error */
-    if (!new_cs->display)
+    if (!new_cs->display) {
+        if (old_cs)
+            memset(old_cs, 0, sizeof(*old_cs));
+
         return !new_cs->window && !new_cs->context;
+    }
 
     if (old_cs) {
         if (old_cs == new_cs)
