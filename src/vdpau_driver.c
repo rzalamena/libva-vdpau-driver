@@ -185,7 +185,12 @@ static VAStatus
 vdpau_common_Initialize(vdpau_driver_data_t *driver_data)
 {
     /* Create a dedicated X11 display for VDPAU purposes */
-    const char * const x11_dpy_name = XDisplayString(driver_data->x11_dpy);
+    const char *x11_dpy_name;
+
+    if (driver_data->x11_dpy == NULL)
+	    return VA_STATUS_ERROR_UNKNOWN;
+
+    x11_dpy_name = XDisplayString(driver_data->x11_dpy);
     driver_data->vdp_dpy = XOpenDisplay(x11_dpy_name);
 
     /* Fallback to existing X11 display */
