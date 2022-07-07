@@ -1277,8 +1277,5 @@ vdpau_EndPicture(
         );
     va_status = vdpau_get_VAStatus(vdp_status);
 
-    /* XXX: assume we are done with rendering right away */
-    obj_context->current_render_target = VA_INVALID_SURFACE;
-
     return va_status;
 }
