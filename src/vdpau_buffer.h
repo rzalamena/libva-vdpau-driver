@@ -33,15 +33,7 @@ struct object_buffer {
     unsigned int        max_num_elements;
     unsigned int        num_elements;
     uint64_t            mtime;
-    unsigned int        delayed_destroy : 1;
 };
-
-// Destroy dead VA buffers
-void
-destroy_dead_va_buffers(
-    vdpau_driver_data_t *driver_data,
-    object_context_p     obj_context
-) attribute_hidden;
 
 // Create VA buffer object
 object_buffer_p
