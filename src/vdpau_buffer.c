@@ -95,9 +95,6 @@ vdpau_CreateBuffer(
 {
     VDPAU_DRIVER_DATA_INIT;
 
-    if (buf_id)
-        *buf_id = VA_INVALID_BUFFER;
-
     /* Validate type */
     switch (type) {
     case VAPictureParameterBufferType:
