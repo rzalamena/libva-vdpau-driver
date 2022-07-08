@@ -55,6 +55,7 @@ struct object_context {
     int                          max_ref_frames;
     VASurfaceID                 *render_targets;
     void                        *last_pic_param;
+    struct object_buffer        *last_slice_data;
     void                        *last_slice_params;
     unsigned int                 last_slice_params_count;
     VdpCodec                     vdp_codec;

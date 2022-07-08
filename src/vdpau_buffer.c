@@ -56,6 +56,7 @@ create_va_buffer(
     obj_buffer->buffer_size      = size * num_elements;
     obj_buffer->buffer_data      = malloc(obj_buffer->buffer_size);
     obj_buffer->mtime            = 0;
+    obj_buffer->next_pre_slice_params = NULL;
 
     if (!obj_buffer->buffer_data) {
         destroy_va_buffer(driver_data, obj_buffer);

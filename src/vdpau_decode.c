@@ -467,10 +467,17 @@ translate_VASliceDataBuffer(
     if (obj_context->vdp_codec == VDP_CODEC_H264) {
         /* Check we have the start code */
         /* XXX: check for other codecs too? */
-        /* XXX: this assumes we get SliceParams before SliceData */
         static const uint8_t start_code_prefix[3] = { 0x00, 0x00, 0x01 };
         VASliceParameterBufferH264 * const slice_params = obj_context->last_slice_params;
         unsigned int i;
+
+	/* Handle case where slice data comes before slice params. */
+	if (obj_context->last_slice_params_count == 0) {
+		obj_buffer->next_pre_slice_params = obj_context->last_slice_data;
+		obj_context->last_slice_data = obj_buffer;
+		return 1;
+	}
+
         for (i = 0; i < obj_context->last_slice_params_count; i++) {
             VASliceParameterBufferH264 * const slice_param = &slice_params[i];
             uint8_t *buf = (uint8_t *)obj_buffer->buffer_data + slice_param->slice_data_offset;
@@ -904,6 +911,29 @@ translate_VASliceParameterBufferH264(
     pic_info->num_ref_idx_l1_active_minus1 = slice_param->num_ref_idx_l1_active_minus1;
     obj_context->last_slice_params         = obj_buffer->buffer_data;
     obj_context->last_slice_params_count   = obj_buffer->num_elements;
+
+    /* Handle cases where slice data came before slice params. */
+    if (obj_context->last_slice_data) {
+	    object_buffer_p sdata_buffer = obj_context->last_slice_data;
+	    object_buffer_p sdata_next = NULL;
+
+	    while (sdata_buffer) {
+		    /*
+		     * If translate failed it is possible we didn't get the
+		     * slice params, continue later.
+		     */
+		    if (!translate_VASliceDataBuffer(driver_data, obj_context,
+						     sdata_buffer))
+			    return 0;
+
+		    sdata_next = sdata_buffer->next_pre_slice_params;
+		    sdata_buffer->next_pre_slice_params = NULL;
+		    sdata_buffer = sdata_next;
+	    }
+
+	    obj_context->last_slice_data = NULL;
+    }
+
     return 1;
 }
 
@@ -1154,6 +1184,7 @@ vdpau_BeginPicture(
 
     obj_surface->va_surface_status           = VASurfaceRendering;
     obj_context->last_pic_param              = NULL;
+    obj_context->last_slice_data             = NULL;
     obj_context->last_slice_params           = NULL;
     obj_context->last_slice_params_count     = 0;
     obj_context->current_render_target       = obj_surface->base.id;

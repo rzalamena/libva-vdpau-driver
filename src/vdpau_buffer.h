@@ -33,6 +33,9 @@ struct object_buffer {
     unsigned int        max_num_elements;
     unsigned int        num_elements;
     uint64_t            mtime;
+
+    /** Holds early slice data the could arrive before params. */
+    struct object_buffer *next_pre_slice_params;
 };
 
 // Create VA buffer object
