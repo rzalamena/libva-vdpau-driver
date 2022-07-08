@@ -28,10 +28,6 @@
 #include "vdpau_mixer.h"
 #include "vdpau_video.h"
 #include "vdpau_video_x11.h"
-#if USE_GLX
-#include "vdpau_video_glx.h"
-#include <va/va_backend_glx.h>
-#endif
 
 #define DEBUG 1
 #include "debug.h"
@@ -164,9 +160,6 @@ vdpau_common_Terminate(vdpau_driver_data_t *driver_data)
     DESTROY_HEAP(context,     NULL);
     DESTROY_HEAP(config,      NULL);
     DESTROY_HEAP(mixer,       destroy_mixer_cb);
-#if USE_GLX
-    DESTROY_HEAP(glx_surface, NULL);
-#endif
 
     if (driver_data->vdp_device != VDP_INVALID_HANDLE) {
         vdpau_device_destroy(driver_data, driver_data->vdp_device);
@@ -267,62 +260,15 @@ vdpau_common_Initialize(vdpau_driver_data_t *driver_data)
     CREATE_HEAP(image,          IMAGE);
     CREATE_HEAP(subpicture,     SUBPICTURE);
     CREATE_HEAP(mixer,          MIXER);
-#if USE_GLX
-    CREATE_HEAP(glx_surface,    GLX_SURFACE);
-#endif
     return VA_STATUS_SUCCESS;
 }
-
-#if VA_MAJOR_VERSION == 0 && VA_MINOR_VERSION >= 31
-#define VA_INIT_VERSION_MAJOR   0
-#define VA_INIT_VERSION_MINOR   31
-#define VA_INIT_VERSION_MICRO   0
-#define VA_INIT_SUFFIX          0_31_0
-#include "vdpau_driver_template.h"
-
-#define VA_INIT_VERSION_MAJOR   0
-#define VA_INIT_VERSION_MINOR   31
-#define VA_INIT_VERSION_MICRO   1
-#define VA_INIT_SUFFIX          0_31_1
-#define VA_INIT_GLX             USE_GLX
-#include "vdpau_driver_template.h"
-
-#define VA_INIT_VERSION_MAJOR   0
-#define VA_INIT_VERSION_MINOR   31
-#define VA_INIT_VERSION_MICRO   2
-#define VA_INIT_SUFFIX          0_31_2
-#define VA_INIT_GLX             USE_GLX
-#include "vdpau_driver_template.h"
-
-VAStatus __vaDriverInit_0_31(void *ctx)
-{
-    VADriverContextP_0_31_0 const ctx0 = ctx;
-    VADriverContextP_0_31_1 const ctx1 = ctx;
-    VADriverContextP_0_31_2 const ctx2 = ctx;
-
-    /* Assume a NULL display implies VA-API 0.31.1 struct with the
-       vtable_tpi field placed just after the vtable, thus replacing
-       original native_dpy field */
-    if (ctx0->native_dpy)
-        return vdpau_Initialize_0_31_0(ctx);
-    if (ctx1->native_dpy)
-        return vdpau_Initialize_0_31_1(ctx);
-    if (ctx2->native_dpy)
-        return vdpau_Initialize_0_31_2(ctx);
-    return VA_STATUS_ERROR_INVALID_DISPLAY;
-}
-#endif
 
 #define VA_INIT_VERSION_MAJOR   VA_MAJOR_VERSION
 #define VA_INIT_VERSION_MINOR   VA_MINOR_VERSION
 #define VA_INIT_VERSION_MICRO   VA_MICRO_VERSION
-#define VA_INIT_GLX             USE_GLX
 #include "vdpau_driver_template.h"
 
 VAStatus VA_DRIVER_INIT_FUNC(void *ctx)
 {
-#if VA_MAJOR_VERSION == 0 && VA_MINOR_VERSION == 31
-    return __vaDriverInit_0_31(ctx);
-#endif
     return vdpau_Initialize_Current(ctx);
 }

@@ -11,11 +11,9 @@ m4_append([vdpau_video_version], vdpau_video_pre_version, [.pre])
 
 # VA-API minimum version number
 m4_define([va_api_x11_version], [0.31.0])
-m4_define([va_api_glx_version], [0.32.0])
 
 # libva package version number
 m4_define([libva_package_x11_version], [1.0.3])
-m4_define([libva_package_glx_version], [1.0.9])
 
 AC_PREREQ([2.57])
 AC_INIT([vdpau_video], [vdpau_video_version], [gwenole.beauchesne@intel.com],
@@ -43,11 +41,6 @@ AC_DEFUN([AC_DEFINE_01], [
         AC_DEFINE($1, 0, $3)
     fi
 ])
-
-AC_ARG_ENABLE(glx,
-    AC_HELP_STRING([--enable-glx],
-                   [enable OpenGL/X11 @<:@default=yes@:>@]),
-    [], [enable_glx="yes"])
 
 AC_ARG_ENABLE(debug,
     AC_HELP_STRING([--enable-debug],
@@ -120,28 +113,10 @@ if test $vdpau_cv_visibility_attribute = yes; then
   AC_DEFINE([HAVE_VISIBILITY_ATTRIBUTE], 1, [Define to use the __attribute__((visibility())) extension])
 fi
 
-dnl Check for OpenGL
-USE_GLX=1
-if test "$enable_glx" != "yes"; then
-    USE_GLX=0
-fi
-GL_DEPS_CFLAGS=""
-GL_DEPS_LIBS=""
-AC_CHECK_HEADERS([GL/gl.h GL/glext.h GL/glx.h], [], [USE_GLX=0], [
-#ifdef HAVE_GL_GL_H
-# include <GL/gl.h>
-#endif
-])
-AC_CHECK_LIB(GL, glXCreateContext, [GL_DEPS_LIBS="-lGL -ldl"], [USE_GLX=0])
-AC_SUBST(GL_DEPS_CFLAGS)
-AC_SUBST(GL_DEPS_LIBS)
-
 dnl Check for VA-API
 PKG_CHECK_MODULES(LIBVA_DEPS,	  [libva])
 PKG_CHECK_MODULES(LIBVA_X11_DEPS, [libva-x11 >= va_api_x11_version],
     [LIBVA_PACKAGE_VERSION=libva_package_x11_version])
-PKG_CHECK_MODULES(LIBVA_GLX_DEPS, [libva-glx >= va_api_glx_version],
-    [LIBVA_PACKAGE_VERSION=libva_package_glx_version], [USE_GLX=0])
 
 VA_VERSION=`$PKG_CONFIG --modversion libva`
 VA_MAJOR_VERSION=`echo "$VA_VERSION" | cut -d'.' -f1`
@@ -198,9 +173,6 @@ vdpau_version VDPAU_VERSION
 EOF
 `
 
-AC_DEFINE_UNQUOTED(USE_GLX, $USE_GLX, [Defined to 1 if GLX is enabled])
-AM_CONDITIONAL(USE_GLX, test $USE_GLX -eq 1)
-
 VDPAU_VIDEO_CFLAGS="$LIBVA_DEPS_CFLAGS"
 VDPAU_VIDEO_LIBS=""
 if test $USE_GLX -eq 1; then
@@ -226,5 +198,4 @@ echo VA-API version ................... : $VA_VERSION_STR
 echo VA-API drivers path .............. : $LIBVA_DRIVERS_PATH
 echo VDPAU version .................... : $VDPAU_VERSION
 echo VDPAU/MPEG-4 support ............. : $(test $HAVE_VDPAU_MPEG4  -eq 1 && echo yes || echo no)
-echo GLX support ...................... : $(test $USE_GLX  -eq 1 && echo yes || echo no)
 echo

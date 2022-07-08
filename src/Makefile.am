@@ -8,11 +8,6 @@ LDADD = \
 	$(VDPAU_VIDEO_LT_LDFLAGS) -module \
 	-no-undefined -module -Wl,--no-undefined
 
-if USE_GLX
-source_glx_h = vdpau_video_glx.h utils_glx.h
-source_glx_c = vdpau_video_glx.c utils_glx.c
-endif
-
 source_x11_h = vdpau_video_x11.h utils_x11.h
 source_x11_c = vdpau_video_x11.c utils_x11.c
 
@@ -35,7 +30,6 @@ source_h = \
 	vdpau_mixer.h		\
 	vdpau_subpic.h		\
 	vdpau_video.h		\
-	$(source_glx_h)		\
 	$(source_x11_h)
 
 source_c = \
@@ -55,7 +49,6 @@ source_c = \
 	vdpau_mixer.c		\
 	vdpau_subpic.c		\
 	vdpau_video.c		\
-	$(source_glx_c)		\
 	$(source_x11_c)
 
 vdpau_drv_video_la_LTLIBRARIES	= vdpau_drv_video.la
@@ -67,8 +60,6 @@ vdpau_drv_video_la_LDFLAGS	= $(LDADD)
 noinst_HEADERS = $(source_h)
 
 EXTRA_DIST = \
-	$(source_glx_c) \
-	$(source_glx_h)	\
 	$(source_x11_c)	\
 	$(source_x11_h)
 
