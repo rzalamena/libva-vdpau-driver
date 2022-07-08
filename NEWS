@@ -1,5 +1,18 @@
-libva-vdpau-driver NEWS -- summary of changes.  2012-10-05
+libva-vdpau-driver NEWS -- summary of changes.
 Copyright (C) 2009-2011 Splitted-Desktop Systems
+
+Version 0.7.5 - 08.Jul.2022
+* Bump libva and libvdpau requirements
+* Remove old libva and libvdpau unused code
+* Replace H264 baseline with H264 constrained baseline
+* Implement library callback: `vaCreateSurfaces2`
+* Implement library callback: `vaQuerySurfaceAttributes`
+* Fix many crashes
+* Fix clang static analyzer warnings
+* Replace obsolete configure.ac AM_CONFIG_HEADER
+* Remove unused GLX/OpenGL support
+* Update library buffer deletion behavior
+* Handle H264 slice data before slice params (Alex Wilson)
 
 Version 0.7.4 - 05.Oct.2012
 * Use upstream libva version
